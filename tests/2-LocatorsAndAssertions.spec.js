@@ -54,6 +54,11 @@ difference between fill and type
 - type() → simulates typing into the input field, character by character, which can be useful for testing scenarios where typing speed or key events matter.
 */
 
+/*
+Input field → toHaveValue()
+Normal element text → toHaveText() / toContainText()
+*/
+
 
 /*
 In Playwright, we can locate elements using CSS selectors or Xpath. CSS selectors are generally preferred for their simplicity and performance. Below are some quick notes on using CSS locators effectively:
