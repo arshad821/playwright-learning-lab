@@ -43,3 +43,6 @@ Generate Playwright locators for selected elements.
 Test/debug locators before adding them to the test.
 See the current test execution state.
 Understand which step is currently being executed.
+
+#record and playback
+npx playwright codegen 'url of the web' #it will launch the pw debug window and web ui

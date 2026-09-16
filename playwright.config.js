@@ -11,6 +11,8 @@ const Config = ({
   use:{
     browserName: 'chromium',
     headless: false,
+    screenshot : 'on', // to create screenshot for each step in report
+    trace : 'on', // 'retain-on-failure', //to log traces in report only when it fails
     actionTimeout: 10 * 1000, //set maximum time for each action to complete, like click, fill, etc.\
     navigationTimeout: 30 * 1000, //set maximum time for navigation to complete
   },
