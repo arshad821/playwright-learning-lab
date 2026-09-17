@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npx playwright test",
     "test:headed": "npx playwright test --headed",
-    "test:eachfile": "npx playwright test tests/9.LoginWebAPI.spec.js"
+    "test:eachfile": "npx playwright test tests/14.FixtureDemo.spec.js"
   },
   "keywords": [],
   "author": "",

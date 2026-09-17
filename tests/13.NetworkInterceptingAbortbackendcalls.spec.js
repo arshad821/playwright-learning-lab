@@ -25,7 +25,6 @@ test("Network Intercepting Abort Backend Calls and API calls Listeners", async (
     await passwordlocator.fill(password);
     await loginButton.click();
     
-   
     //validating logged in by asserting login msg
     await expect(toastpopupmsg).toContainText("Login Successfully");
     //abort all backend calls to simulate a scenario where the backend is down or not responding.
