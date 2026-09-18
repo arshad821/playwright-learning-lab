@@ -10,7 +10,7 @@ customTestbase("Fixture Demo Test", async ({authenticatedPage, CreateOrder, Test
     const myorderButton = await authenticatedPage.locator("[routerlink*='myorders']");
     await myorderButton.first().click();
     //just validating the order id which is created by the api response which is stored in CreateOrder
-    console.log("CreateOrder :", CreateOrder);
+    //console.log("CreateOrder :", CreateOrder);
     await expect(authenticatedPage.getByText(CreateOrder.OrderID)).toBeVisible();
 
     //It can be accessed with property name
