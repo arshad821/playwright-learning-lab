@@ -1,0 +1,315 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: demo2.spec.ts >> Checkout - advanced scenarios >> Usability >> keyboard-only flow: tab through fields and press Enter on Place Order
+- Location: tests\demo2.spec.ts:324:9
+
+# Error details
+
+```
+Error: expect(page).toHaveURL(expected) failed
+
+Expected pattern: /thanks/
+Received string:  "https://rahulshettyacademy.com/client/#/dashboard/order?prop=%5B%226960ea76c941646b7a8b3dd5%22%5D"
+Timeout: 5000ms
+
+Call log:
+  - Expect "toHaveURL" with timeout 5000ms
+    14 × locator resolved to <html lang="en">…</html>
+       - unexpected value "https://rahulshettyacademy.com/client/#/dashboard/order?prop=%5B%226960ea76c941646b7a8b3dd5%22%5D"
+
+```
+
+```yaml
+- navigation:
+  - link "Automation Automation Practice":
+    - /url: ""
+    - heading "Automation" [level=3]
+    - paragraph: Automation Practice
+  - link "🎯 I'll help you prepare for your next QA job — Explore the QA Career Accelerator.":
+    - /url: https://rahulshettyacademy.com/qa-career-accelerator-job-ready
+  - list:
+    - listitem:
+      - button " HOME"
+    - listitem
+    - listitem:
+      - button " ORDERS"
+    - listitem:
+      - button " Cart 1"
+    - listitem:
+      - button "Sign Out"
+- text: "iphone 13 pro $ 55000 Quantity: 1"
+- list:
+  - listitem: Apple phone
+- text: Payment Method Credit Card Paypal SEPA Invoice Personal Information Credit Card Number
+- textbox: 4542 9931 9292 2293
+- text: Expiry Date
+- combobox:
+  - option "01" [selected]
+  - option "02"
+  - option "03"
+  - option "04"
+  - option "05"
+  - option "06"
+  - option "07"
+  - option "08"
+  - option "09"
+  - option "10"
+  - option "11"
+  - option "12"
+- combobox:
+  - option "01"
+  - option "02"
+  - option "03"
+  - option "04"
+  - option "05"
+  - option "06"
+  - option "07"
+  - option "08"
+  - option "09"
+  - option "10"
+  - option "11"
+  - option "12"
+  - option "13"
+  - option "14"
+  - option "15"
+  - option "16" [selected]
+  - option "17"
+  - option "18"
+  - option "19"
+  - option "20"
+  - option "21"
+  - option "22"
+  - option "23"
+  - option "24"
+  - option "25"
+  - option "26"
+  - option "27"
+  - option "28"
+  - option "29"
+  - option "30"
+  - option "31"
+- text: CVV Code ?
+- textbox: "123"
+- text: Name on Card
+- textbox: Mohamed Arshad
+- text: Apply Coupon
+- textbox
+- button "Apply Coupon"
+- text: Shipping Information arsharahsd977@gmail.com
+- textbox: arsharahsd977@gmail.com
+- textbox "Select Country": India
+- text: Place Order
+```
+
+# Test source
+
+```ts
+  233 |   // 5. Security-style inputs
+  234 |   // =====================================================
+  235 |   test.describe('Security inputs', () => {
+  236 |     test('XSS payload in Name on Card is not executed', async ({ page }) => {
+  237 |       let dialogShown = false;
+  238 |       page.on('dialog', async (d) => {
+  239 |         dialogShown = true;
+  240 |         await d.dismiss();
+  241 |       });
+  242 |       await page.locator('.field:has-text("Name on Card") input').fill('<script>alert("xss")</script>');
+  243 |       await page.locator('.field:has-text("CVV Code") input').fill('123');
+  244 |       await selectCountry(page, 'ind', 'India');
+  245 |       await page.locator('.action__submit').click();
+  246 |       await page.waitForTimeout(1500);
+  247 | 
+  248 |       expect(dialogShown).toBe(false);
+  249 |     });
+  250 | 
+  251 |     test('SQL injection string in coupon is handled safely', async ({ page }) => {
+  252 |       await page.locator('input[name="coupon"]').fill("' OR '1'='1");
+  253 |       await page.getByRole('button', { name: 'Apply Coupon' }).click();
+  254 | 
+  255 |       await expect(page.getByText('* Invalid Coupon')).toBeVisible();
+  256 |       await expect(page.getByText('* Coupon Applied')).toHaveCount(0);
+  257 |     });
+  258 | 
+  259 |     test('coupon with leading/trailing spaces and wrong case', async ({ page }) => {
+  260 |       await page.locator('input[name="coupon"]').fill(' RAHULSHETTYACADEMY ');
+  261 |       await page.getByRole('button', { name: 'Apply Coupon' }).click();
+  262 |       // Document actual behaviour - either result is worth a note to the team
+  263 |       const applied = await page.getByText('* Coupon Applied').isVisible().catch(() => false);
+  264 |       console.log(`Coupon with spaces/uppercase applied: ${applied}`);
+  265 |     });
+  266 |   });
+  267 | 
+  268 |   // =====================================================
+  269 |   // 6. State & session behaviour
+  270 |   // =====================================================
+  271 |   test.describe('State and session', () => {
+  272 |     test('page refresh keeps the user on checkout with product intact', async ({ page }) => {
+  273 |       await page.reload();
+  274 |       await expect(page.locator('.item__title')).toContainText(PRODUCT);
+  275 |     });
+  276 | 
+  277 |     test('country is cleared after refresh (form state not persisted)', async ({ page }) => {
+  278 |       await selectCountry(page, 'ind', 'India');
+  279 |       await page.reload();
+  280 |       await expect(page.locator('input[placeholder="Select Country"]')).toHaveValue('');
+  281 |     });
+  282 | 
+  283 |     test('browser back after successful order does not allow re-submitting', async ({ page }) => {
+  284 |       await fillValidCardDetails(page);
+  285 |       await selectCountry(page, 'ind', 'India');
+  286 |       await page.locator('.action__submit').click();
+  287 |       await page.waitForURL(/thanks/);
+  288 | 
+  289 |       await page.goBack();
+  290 |       // cart should be empty now, so checkout must not show the old product
+  291 |       await expect(page.locator('.item__title')).toHaveCount(0);
+  292 |     });
+  293 | 
+  294 |     test('cart is emptied after placing an order', async ({ page }) => {
+  295 |       await fillValidCardDetails(page);
+  296 |       await selectCountry(page, 'ind', 'India');
+  297 |       await page.locator('.action__submit').click();
+  298 |       await page.waitForURL(/thanks/);
+  299 | 
+  300 |       await page.locator('button[routerlink*="cart"]').first().click();
+  301 |       await expect(page.getByText(/No Products in Your Cart/i)).toBeVisible();
+  302 |     });
+  303 | 
+  304 |     test('sign out then browser back does not expose the checkout', async ({ page }) => {
+  305 |       await page.getByRole('button', { name: /Sign Out/ }).click();
+  306 |       await expect(page).toHaveURL(/login/);
+  307 |       await page.goBack();
+  308 |       await expect(page.locator('.item__title')).toHaveCount(0);
+  309 |     });
+  310 | 
+  311 |     test('opening checkout in a new tab after token removal redirects to login', async ({ page, context }) => {
+  312 |       const newTab = await context.newPage();
+  313 |       await newTab.goto(`${BASE_URL}/#/auth/login`);
+  314 |       await newTab.evaluate(() => localStorage.clear());
+  315 |       await newTab.goto(`${BASE_URL}/#/dashboard/order`);
+  316 |       await expect(newTab).not.toHaveURL(/dashboard\/order/);
+  317 |     });
+  318 |   });
+  319 | 
+  320 |   // =====================================================
+  321 |   // 7. UI / usability
+  322 |   // =====================================================
+  323 |   test.describe('Usability', () => {
+  324 |     test('keyboard-only flow: tab through fields and press Enter on Place Order', async ({ page }) => {
+  325 |       await page.locator('.field:has-text("CVV Code") input').focus();
+  326 |       await page.keyboard.type('123');
+  327 |       await page.keyboard.press('Tab');
+  328 |       await page.keyboard.type('Mohamed Arshad');
+  329 | 
+  330 |       await selectCountry(page, 'ind', 'India');
+  331 |       await page.locator('.action__submit').focus();
+  332 |       await page.keyboard.press('Enter');
+> 333 |       await expect(page).toHaveURL(/thanks/);
+      |                          ^ Error: expect(page).toHaveURL(expected) failed
+  334 |     });
+  335 | 
+  336 |     test('country dropdown closes after selection', async ({ page }) => {
+  337 |       await selectCountry(page, 'ind', 'India');
+  338 |       await expect(page.locator('.ta-results button')).toHaveCount(0);
+  339 |     });
+  340 | 
+  341 |     test('country search is case-insensitive', async ({ page }) => {
+  342 |       await page.locator('input[placeholder="Select Country"]').pressSequentially('IND', { delay: 80 });
+  343 |       await expect(page.locator('.ta-results button').first()).toBeVisible();
+  344 |     });
+  345 | 
+  346 |     test('mobile viewport - hamburger menu and form are usable', async ({ page }) => {
+  347 |       await page.setViewportSize({ width: 375, height: 667 });
+  348 |       await expect(page.locator('label.hamberger-btn')).toBeVisible();
+  349 |       await expect(page.locator('.action__submit')).toBeVisible();
+  350 |       await expect(page.locator('select.ddl').first()).toBeVisible();
+  351 |     });
+  352 | 
+  353 |     test('no broken images and no console errors on load', async ({ page }) => {
+  354 |       const errors: string[] = [];
+  355 |       page.on('console', (msg) => {
+  356 |         if (msg.type() === 'error') errors.push(msg.text());
+  357 |       });
+  358 |       await page.reload();
+  359 |       await page.locator('.item__title').waitFor();
+  360 | 
+  361 |       const broken = await page.$$eval('img', (imgs) =>
+  362 |         imgs.filter((i) => !(i as HTMLImageElement).complete || (i as HTMLImageElement).naturalWidth === 0).length
+  363 |       );
+  364 |       expect(broken).toBe(0);
+  365 |       expect(errors, `Console errors: ${errors.join(' | ')}`).toHaveLength(0);
+  366 |     });
+  367 |   });
+  368 | });
+  369 | 
+  370 | // =====================================================
+  371 | // 8. Hybrid API + UI and multi-user / multi-order checks
+  372 | // =====================================================
+  373 | test.describe('Hybrid API + UI', () => {
+  374 |   test('order created via UI is visible through the orders API', async ({ page, request }) => {
+  375 |     const { token } = await apiLogin(request);
+  376 |     await loginWithToken(page, token);
+  377 |     await addProductToCartUI(page, PRODUCT);
+  378 |     await openCheckout(page);
+  379 |     await fillValidCardDetails(page);
+  380 |     await selectCountry(page, 'ind', 'India');
+  381 |     await page.locator('.action__submit').click();
+  382 |     await page.waitForURL(/thanks/);
+  383 | 
+  384 |     const uiOrderId = (await page.locator('.em-spacer-1 .ng-star-inserted').textContent())!
+  385 |       .replace(/\|/g, '')
+  386 |       .trim();
+  387 | 
+  388 |     const { userId } = await apiLogin(request);
+  389 |     const res = await request.get(`${API_URL}/order/get-orders-for-customer/${userId}`, {
+  390 |       headers: { Authorization: token },
+  391 |     });
+  392 |     expect(res.ok()).toBeTruthy();
+  393 |     const body = await res.json();
+  394 |     const ids = body.data.map((o: { _id: string }) => o._id);
+  395 |     expect(ids).toContain(uiOrderId);
+  396 |   });
+  397 | 
+  398 |   test('order details page shows same country and product as selected at checkout', async ({ page, request }) => {
+  399 |     const { token } = await apiLogin(request);
+  400 |     await loginWithToken(page, token);
+  401 |     await addProductToCartUI(page, PRODUCT);
+  402 |     await openCheckout(page);
+  403 |     await fillValidCardDetails(page);
+  404 |     await selectCountry(page, 'ind', 'India');
+  405 |     await page.locator('.action__submit').click();
+  406 |     await page.waitForURL(/thanks/);
+  407 | 
+  408 |     await page.locator('button[routerlink*="myorders"]').first().click();
+  409 |     await page.locator('tbody tr').first().waitFor();
+  410 |     await page.locator('tbody tr').first().getByRole('button', { name: 'View' }).click();
+  411 | 
+  412 |     await expect(page.locator('.col-text').first()).toContainText(/.+/);
+  413 |     await expect(page.locator('.address')).toContainText('India');
+  414 |   });
+  415 | 
+  416 |   test('two users checking out at the same time do not see each other orders', async ({ browser, request }) => {
+  417 |     const { token } = await apiLogin(request);
+  418 | 
+  419 |     const ctxA = await browser.newContext();
+  420 |     const ctxB = await browser.newContext();
+  421 |     await loginWithToken(ctxA, token);
+  422 |     await loginWithToken(ctxB, token);
+  423 |     const pageA = await ctxA.newPage();
+  424 |     const pageB = await ctxB.newPage();
+  425 | 
+  426 |     for (const p of [pageA, pageB]) {
+  427 |       await addProductToCartUI(p, PRODUCT);
+  428 |       await openCheckout(p);
+  429 |       await fillValidCardDetails(p);
+  430 |       await selectCountry(p, 'ind', 'India');
+  431 |     }
+  432 | 
+  433 |     await Promise.all([pageA.locator('.action__submit').click(), pageB.locator('.action__submit').click()]);
+```

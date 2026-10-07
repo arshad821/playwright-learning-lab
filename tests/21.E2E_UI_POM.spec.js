@@ -39,8 +39,6 @@ test("E2E Order Placement - Page Object Model", async ({ page }) => {
     const OrderID = await orderconfirmpage.verifyOrderIDandClickMyOrder()
     await orderlistingpage.VerifyOrderid(OrderID);
 
-    
-
          
 });
 

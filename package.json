@@ -4,8 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test",
-    "test:headed": "npx playwright test --headed",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:chrome": "playwright test --project=Chromium",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:report": "playwright show-report",
+    "test:allure": "allure serve allure-results",
     "test:eachfile": "npx playwright test tests/21.E2E_UI_POM.spec.js"
   },
   "keywords": [],
@@ -13,10 +18,14 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "@types/node": "^26.1.2"
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.1.2",
+    "allure-commandline": "^2.46.1",
+    "allure-playwright": "^3.13.0",
+    "typescript": "^7.0.2"
   },
   "dependencies": {
+    "@cucumber/cucumber": "^13.3.0",
     "exceljs": "^4.4.0"
   }
 }

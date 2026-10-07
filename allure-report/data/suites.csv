@@ -1,0 +1,2 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","11076","E2E Order Placement - Page Object Model","","2026-10-01","passed","2026-10-01","","21.E2E_UI_POM.spec.js","",""

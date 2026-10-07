@@ -1,6 +1,12 @@
 
 const { test ,expect} = require("@playwright/test");
 
+//now all the 3 tests will run parallely in 3 diff workeres
+//test.describe.configure({mode : "parallel"})
+
+//if the tests are interdependent we can use this serial if the first test fails then all the 2 will be skipped, so it won't waste time
+test.describe.configure({mode : "serial"})
+
 test("Capture Screenshot FullScreen & Element Level", async ({ page }) => {
 
     const baseURL = "https://rahulshettyacademy.com/client/#/auth/login";
