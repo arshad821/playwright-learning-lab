@@ -8,7 +8,6 @@ const { expect } = require("@playwright/test");
 Given(
   "User should login to the ecommerce site with {string} and {string}", {timeout: 10 * 1000},
   async function (username, password) {
-    
     const loginpage = this.pomanager.getloginpage();
     await loginpage.goTo();
     await loginpage.ValidLogin(username, password);

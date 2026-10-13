@@ -18,6 +18,8 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@azure/identity": "^4.13.3",
+    "@azure/playwright": "^1.1.6",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.1.2",
     "allure-commandline": "^2.46.1",
